@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quadrilateral Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#EAF0F7; --paper:#FBFDFF; --grid:#DCE6F2; --grid-strong:#C5D5EA;
+  --surface:#FFFFFF; --surface-2:#F3F6FB; --ink:#1B2540; --ink-2:#56617A; --line:#D6DFEB;
+  --pen:#2F5BEA; --pen-ink:#FFFFFF; --pen-soft:rgba(47,91,234,.13); --pen-softer:rgba(47,91,234,.07);
+  --hi:#F2A900; --hi-soft:rgba(255,194,51,.32);
+  --yes:#12825A; --yes-bg:#DBF2E8; --no:#B23A55; --no-bg:#F9E2E8; --na:#8A93A8; --na-bg:#ECEFF4;
+  --p1:#E0701A; --p2:#8A4DDB;
+  --shadow:0 1px 2px rgba(27,37,64,.06),0 6px 20px rgba(27,37,64,.07);
+  --display:"Fredoka","Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --body:"Nunito",ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1422; --paper:#141C2E; --grid:#1F2A42; --grid-strong:#2B3A5A;
+    --surface:#172035; --surface-2:#1C263D; --ink:#E8EDF7; --ink-2:#9DA8C0; --line:#2A3652;
+    --pen:#7C9BFF; --pen-ink:#0E1422; --pen-soft:rgba(124,155,255,.18); --pen-softer:rgba(124,155,255,.08);
+    --hi:#FFCB4D; --hi-soft:rgba(255,203,77,.22);
+    --yes:#52D6A0; --yes-bg:#123B2D; --no:#FF8AA3; --no-bg:#3F1A27; --na:#8A93A8; --na-bg:#232C42;
+    --p1:#FFA254; --p2:#B990FF;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1422; --paper:#141C2E; --grid:#1F2A42; --grid-strong:#2B3A5A;
+  --surface:#172035; --surface-2:#1C263D; --ink:#E8EDF7; --ink-2:#9DA8C0; --line:#2A3652;
+  --pen:#7C9BFF; --pen-ink:#0E1422; --pen-soft:rgba(124,155,255,.18); --pen-softer:rgba(124,155,255,.08);
+  --hi:#FFCB4D; --hi-soft:rgba(255,203,77,.22);
+  --yes:#52D6A0; --yes-bg:#123B2D; --no:#FF8AA3; --no-bg:#3F1A27; --na:#8A93A8; --na-bg:#232C42;
+  --p1:#FFA254; --p2:#B990FF;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg)}
+body{font-family:var(--body);color:var(--ink);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:18px 48px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 24px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{flex:none}
+.brand h1{font-family:var(--display);font-weight:600;font-size:clamp(26px,3.4vw,34px);line-height:1.05;margin:0;letter-spacing:-.01em}
+.brand p{margin:3px 0 0;color:var(--ink-2);font-size:15px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface);padding:4px;border-radius:14px;box-shadow:var(--shadow)}
+.tab{border:0;background:transparent;padding:9px 14px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;color:var(--ink-2)}
+.tab:hover{color:var(--ink);background:var(--surface-2)}
+.tab[aria-selected="true"]{background:var(--pen);color:var(--pen-ink)}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+
+/* studio */
+.studio{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.studio{grid-template-columns:1fr}}
+.stage{display:flex;flex-direction:column;gap:10px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px 6px 8px;font-weight:700;font-size:14px;cursor:pointer}
+.chip svg{flex:none}
+.chip:hover{border-color:var(--pen)}
+.chip[aria-pressed="true"]{background:var(--pen);border-color:var(--pen);color:var(--pen-ink)}
+.chip[aria-pressed="true"] svg *{stroke:var(--pen-ink)}
+.board-wrap{position:relative;border-radius:16px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow);border:1px solid var(--line)}
+#board{display:block;width:100%;height:clamp(330px,62vh,620px);touch-action:none;user-select:none;-webkit-user-select:none}
+.board-note{position:absolute;left:10px;top:10px;max-width:calc(100% - 20px);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13.5px;color:var(--ink-2);pointer-events:none}
+.board-note b{color:var(--ink)}
+.tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tog{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 11px;font-weight:700;font-size:14px;cursor:pointer}
+.tog .box{width:16px;height:16px;border-radius:5px;border:2px solid var(--ink-2);display:grid;place-items:center}
+.tog[aria-pressed="true"] .box{background:var(--pen);border-color:var(--pen)}
+.tog[aria-pressed="true"] .box::after{content:"";width:7px;height:4px;border-left:2px solid var(--pen-ink);border-bottom:2px solid var(--pen-ink);transform:rotate(-45deg) translate(1px,-1px)}
+.tools .sep{flex:1}
+.iconbtn{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.iconbtn:hover,.tog:hover{border-color:var(--pen)}
+.tip{margin:0;color:var(--ink-2);font-size:14px}
+.tip b{color:var(--ink)}
+
+/* svg */
+.gl{stroke:var(--grid);stroke-width:1px;vector-effect:non-scaling-stroke}
+.gl.s{stroke:var(--grid-strong)}
+.fill{fill:var(--pen-soft);cursor:grab}
+.fill.bad{fill:var(--no-bg)}
+.dragging .fill,.dragging .sidehit{cursor:grabbing}
+.side{stroke:var(--pen);stroke-width:3.5px;vector-effect:non-scaling-stroke;stroke-linecap:round;fill:none}
+.side.p1{stroke:var(--p1);stroke-width:5px}.side.p2{stroke:var(--p2);stroke-width:5px}.side.hi{stroke:var(--hi);stroke-width:5.5px}
+.side.bad{stroke:var(--no)}
+.sidehit{stroke:transparent;stroke-width:22px;vector-effect:non-scaling-stroke;cursor:grab;stroke-linecap:round}
+.sidehit:hover+.sidegrip{opacity:1}
+.mk{stroke:var(--ink);stroke-width:2px;vector-effect:non-scaling-stroke;fill:none;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.mk.p1{stroke:var(--p1)}.mk.p2{stroke:var(--p2)}
+.diag{stroke:var(--ink-2);stroke-width:2px;stroke-dasharray:7 6;vector-effect:non-scaling-stroke;pointer-events:none}
+.diag.hi{stroke:var(--hi);stroke-width:3.5px;stroke-dasharray:none}
+.arc{fill:var(--pen-softer);stroke:var(--ink-2);stroke-width:1.5px;vector-effect:non-scaling-stroke;pointer-events:none}
+.arc.hi{fill:var(--hi-soft);stroke:var(--hi);stroke-width:2.5px}
+.lab{fill:var(--ink);font-family:var(--body);font-weight:800;paint-order:stroke;stroke:var(--paper);stroke-width:var(--lw,.1);stroke-linejoin:round;pointer-events:none;font-variant-numeric:tabular-nums}
+.lab.ang{fill:var(--ink-2);font-weight:700}
+.lab.ang.hi,.lab.hi{fill:var(--ink)}
+.lab.vx{font-family:var(--display);font-weight:600;fill:var(--pen)}
+.lab.p1{fill:var(--p1)}.lab.p2{fill:var(--p2)}
+.vh{fill:var(--surface);stroke:var(--pen);stroke-width:3px;vector-effect:non-scaling-stroke;pointer-events:none}
+.vhit{fill:transparent;cursor:grab}
+.vhit:hover+.vh{fill:var(--pen)}
+
+/* panel */
+.panel{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.shapename{font-family:var(--display);font-weight:600;font-size:clamp(30px,4vw,40px);line-height:1.05;letter-spacing:-.01em;color:var(--pen);margin-top:2px;text-wrap:balance}
+.shapename.bad{color:var(--no)}
+.note{margin:6px 0 0;color:var(--ink);font-size:15px}
+.also{margin:4px 0 0;color:var(--ink-2);font-size:14.5px}
+.also b{color:var(--ink)}
+.plist{display:flex;flex-direction:column;gap:6px}
+.prow{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 10px;cursor:pointer;width:100%}
+.prow:hover{border-color:var(--pen)}
+.prow.on{border-color:var(--hi);background:var(--hi-soft)}
+.picon{width:28px;height:28px;color:var(--ink-2)}
+.picon svg{width:28px;height:28px;display:block}
+.ptext{display:flex;flex-direction:column;min-width:0}
+.plabel{font-weight:800;font-size:15px;line-height:1.25}
+.phelp{font-size:13px;color:var(--ink-2);line-height:1.3}
+.pev{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:3px;line-height:1.3}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:64px;padding:5px 10px;border-radius:999px;font-weight:800;font-size:14px;white-space:nowrap}
+.pill.yes{background:var(--yes-bg);color:var(--yes)}
+.pill.no{background:var(--no-bg);color:var(--no)}
+.pill.na{background:var(--na-bg);color:var(--na)}
+.pill.any{background:var(--surface-2);color:var(--ink-2);border:1.5px dashed var(--line)}
+.pill.sm{min-width:0;font-size:12.5px;padding:3px 8px}
+.pills{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.sum{border-top:1px dashed var(--line);padding-top:10px;font-size:14px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.sum b{color:var(--ink)}
+.intro{margin:0;font-size:14.5px;color:var(--ink-2)}
+.result{background:var(--surface-2);border-radius:12px;padding:12px 14px}
+.result p{margin:6px 0 0;font-size:14.5px}
+.result.bad{background:var(--no-bg)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:0;border-radius:10px;padding:9px 14px;font-weight:800;font-size:14.5px;cursor:pointer;background:var(--surface-2);color:var(--ink);border:1.5px solid var(--line)}
+.btn.primary{background:var(--pen);border-color:var(--pen);color:var(--pen-ink)}
+.btn:hover{border-color:var(--pen)}
+.meter{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:10px}
+.meter span{display:block;height:100%;background:var(--yes);border-radius:99px;transition:width .25s}
+.prow.match{border-color:color-mix(in srgb,var(--yes) 45%,var(--line))}
+.prow.miss{border-color:color-mix(in srgb,var(--no) 55%,var(--line))}
+.hint{margin:0;background:var(--hi-soft);border-radius:12px;padding:10px 12px;font-size:14.5px}
+
+/* celebrate */
+.celebrate{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:var(--surface);border:2px solid var(--yes);border-radius:14px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);max-width:calc(100% - 20px);animation:pop .35s ease-out}
+.celebrate strong{font-family:var(--display);font-weight:600;font-size:20px;color:var(--yes)}
+@keyframes pop{from{transform:translate(-50%,-8px) scale(.94);opacity:0}to{transform:translate(-50%,0) scale(1);opacity:1}}
+.burst{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.burst i{position:absolute;left:50%;top:40%;width:10px;height:10px;border-radius:2px;animation:fly 1.1s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+
+/* table */
+.tablev{background:var(--surface);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--line);padding:18px}
+.tv-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+.tv-head h2{font-family:var(--display);font-weight:600;font-size:26px;margin:0}
+.tv-head p{margin:4px 0 0;color:var(--ink-2);max-width:60ch}
+.tscroll{overflow-x:auto;border-radius:12px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{border-bottom:1px solid var(--line);padding:8px;text-align:center;vertical-align:middle}
+thead th{background:var(--surface-2);font-weight:800;font-size:14px}
+tbody th{text-align:left;font-weight:700;font-size:14.5px;background:var(--surface-2);width:210px}
+tr:last-child th,tr:last-child td{border-bottom:0}
+.colhead{display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:transparent;cursor:pointer;padding:4px 6px;border-radius:8px;font-weight:800}
+.colhead:hover{background:var(--pen-soft)}
+.colhead small{font-weight:700;color:var(--pen);font-size:12px}
+.cell{border:0;background:transparent;padding:4px;border-radius:999px;cursor:pointer;min-width:68px;position:relative}
+.cell.sel{outline:3px solid var(--hi);outline-offset:1px}
+.cell .star{position:absolute;top:-7px;right:-7px;color:var(--hi);font-size:14px;line-height:1}
+.pill.q{background:var(--surface-2);color:var(--ink-2);border:1.5px dashed var(--ink-2)}
+.pill.right{box-shadow:0 0 0 2.5px var(--yes)}
+.pill.wrong{box-shadow:0 0 0 2.5px var(--no)}
+.why{margin-top:14px;background:var(--surface-2);border-radius:12px;padding:12px 14px;min-height:52px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.why p{margin:0;max-width:75ch}
+.score{font-family:var(--display);font-weight:600;font-size:20px;color:var(--pen)}
+.foot{margin:12px 0 0;color:var(--ink-2);font-size:14px}
+.foot .star{color:var(--hi)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="11" fill="var(--pen)"/><path d="M13 12 L33 15 L30 32 L10 28 Z" fill="none" stroke="var(--pen-ink)" stroke-width="3" stroke-linejoin="round"/><circle cx="13" cy="12" r="3" fill="var(--hi)"/><circle cx="33" cy="15" r="3" fill="var(--pen-ink)"/><circle cx="30" cy="32" r="3" fill="var(--pen-ink)"/><circle cx="10" cy="28" r="3" fill="var(--pen-ink)"/></svg>
+      <div>
+        <h1>Quadrilateral Lab</h1>
+        <p>Drag, stretch and twist four-sided shapes to discover their properties.</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Mode">
+      <button class="tab" role="tab" id="tab-explore" data-mode="explore" aria-selected="true">Explore</button>
+      <button class="tab" role="tab" id="tab-rules" data-mode="rules" aria-selected="false">Build from rules</button>
+      <button class="tab" role="tab" id="tab-challenge" data-mode="challenge" aria-selected="false">Challenge</button>
+      <button class="tab" role="tab" id="tab-table" data-mode="table" aria-selected="false">Property table</button>
+    </nav>
+  </header>
+
+  <main id="studio" class="studio">
+    <section class="stage">
+      <div id="chips" class="chips" aria-label="Choose a shape"></div>
+      <div class="board-wrap" id="boardWrap">
+        <svg id="board" aria-label="Drawing board with a draggable quadrilateral"><g id="gGrid"></g><g id="gShape"></g></svg>
+        <div id="lockNote" class="board-note"></div>
+        <div id="celebrate" class="celebrate" hidden></div>
+        <div id="burst" class="burst"></div>
+      </div>
+      <div class="tools">
+        <button class="tog" id="tLen" aria-pressed="true"><span class="box"></span>Side lengths</button>
+        <button class="tog" id="tAng" aria-pressed="true"><span class="box"></span>Angles</button>
+        <button class="tog" id="tDiag" aria-pressed="true"><span class="box"></span>Diagonals</button>
+        <button class="tog" id="tSnap" aria-pressed="true"><span class="box"></span>Snap to grid</button>
+        <span class="sep"></span>
+        <button class="iconbtn" id="rotL" title="Turn left 15°"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>Turn</button>
+        <button class="iconbtn" id="rotR" title="Turn right 15°"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>Turn</button>
+      </div>
+      <p class="tip">Drag a <b>corner</b> · drag a <b>side</b> · drag the <b>middle</b> to move it · each grid square is <b>1 cm</b></p>
+    </section>
+    <aside id="panel" class="panel" aria-live="polite"></aside>
+  </main>
+
+  <section id="tableView" class="tablev" hidden>
+    <div class="tv-head">
+      <div>
+        <h2>The property table</h2>
+        <p>The same table as the worksheet. Tap any answer to find out why, or switch on quiz mode and test yourself.</p>
+      </div>
+      <div class="btns">
+        <button class="tog" id="quizBtn" aria-pressed="false"><span class="box"></span>Quiz mode</button>
+        <button class="btn primary" id="checkBtn" hidden>Check my answers</button>
+        <button class="btn" id="resetQuiz" hidden>Start again</button>
+      </div>
+    </div>
+    <div class="tscroll"><table id="ptable"></table></div>
+    <div id="why" class="why"><p>Tap an answer in the table to see the reason.</p></div>
+    <p class="foot"><span class="star">★</span> marks the tricky ones, the answers people most often get wrong. Tap a shape’s name to open it in Explore.</p>
+  </section>
+</div>
+
+<script>
+(()=>{
+/* ---------- vector helpers ---------- */
+const v=(x,y)=>({x,y});
+const add=(a,b)=>v(a.x+b.x,a.y+b.y), sub=(a,b)=>v(a.x-b.x,a.y-b.y), mul=(a,k)=>v(a.x*k,a.y*k);
+const dot=(a,b)=>a.x*b.x+a.y*b.y, crs=(a,b)=>a.x*b.y-a.y*b.x, len=a=>Math.hypot(a.x,a.y);
+const nrm=a=>{const l=len(a)||1;return v(a.x/l,a.y/l)}, perp=a=>v(-a.y,a.x), mid=(a,b)=>v((a.x+b.x)/2,(a.y+b.y)/2);
+const R2D=180/Math.PI;
+const fmt=x=>{let r=Math.round(x*10)/10; if(Object.is(r,-0))r=0; return String(r)};
+const area=V=>{let s=0;for(let i=0;i<4;i++)s+=crs(V[i],V[(i+1)%4]);return s/2};
+const centroid=V=>mul(V.reduce((a,b)=>add(a,b),v(0,0)),.25);
+const clone=V=>V.map(p=>v(p.x,p.y));
+function segX(p1,p2,p3,p4){
+  const d1=crs(sub(p2,p1),sub(p3,p1)),d2=crs(sub(p2,p1),sub(p4,p1)),d3=crs(sub(p4,p3),sub(p1,p3)),d4=crs(sub(p4,p3),sub(p2,p3));
+  const e=1e-9;return ((d1>e&&d2<-e)||(d1<-e&&d2>e))&&((d3>e&&d4<-e)||(d3<-e&&d4>e));
+}
+const lineAngle=(a,b)=>Math.acos(Math.min(1,Math.abs(dot(a,b))/(len(a)*len(b)||1)))*R2D;
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=s=>document.querySelector(s);
+
+/* ---------- content ---------- */
+const PROPS=[
+  {k:'OS',label:'Opposite sides equal in length',help:'Sides facing each other are the same length.',
+   icon:'<rect x="3" y="6" width="18" height="12" rx="1"/><path d="M12 4.5v3M12 16.5v3M1.5 11h3M1.5 13h3M19.5 11h3M19.5 13h3"/>'},
+  {k:'AS',label:'All sides equal in length',help:'All four sides are the same length.',
+   icon:'<path d="M12 3 21 12 12 21 3 12Z"/><path d="M6.5 6.5l2 2M15.5 8.5l2-2M15.5 15.5l2 2M6.5 17.5l2-2"/>'},
+  {k:'RA',label:'All angles are right angles',help:'Every corner is a square corner (90°).',
+   icon:'<path d="M5 3v16h16"/><path d="M5 13h6v6"/>'},
+  {k:'PP',label:'Both pairs of opposite sides parallel',help:'Facing sides never meet, like train tracks.',
+   icon:'<path d="M3 8h18M3 16h18M10.5 5.5l2.5 2.5-2.5 2.5M10.5 13.5l2.5 2.5-2.5 2.5"/>'},
+  {k:'DE',label:'Diagonals equal in length',help:'The two corner-to-corner lines are the same length.',
+   icon:'<rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 6l18 12M21 6 3 18"/>'},
+  {k:'DP',label:'Diagonals intersect at right angles',help:'The corner-to-corner lines cross like a plus sign.',
+   icon:'<path d="M12 3 21 12 12 21 3 12Z"/><path d="M12 3v18M3 12h18"/><path d="M12 9h3v3"/>'},
+  {k:'AE',label:'All angles equal',help:'All four corners are the same size.',
+   icon:'<rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 10a4 4 0 0 0 4-4M17 6a4 4 0 0 0 4 4M21 14a4 4 0 0 0-4 4M7 18a4 4 0 0 0-4-4"/>'}
+];
+const PK=PROPS.map(p=>p.k);
+const PRESETS={
+  free:[[-2,-3],[4,-2],[3,3],[-4,2]],
+  rectangle:[[-3,-2],[3,-2],[3,2],[-3,2]],
+  square:[[-2,-2],[2,-2],[2,2],[-2,2]],
+  parallelogram:[[-2,-2],[4,-2],[2,2],[-4,2]],
+  kite:[[0,-3],[2,-1],[0,4],[-2,-1]],
+  rhombus:[[-1,-2],[4,-2],[1,2],[-4,2]],
+  trapezium:[[-1,-2],[2,-2],[4,2],[-4,2]],
+  isoTrap:[[-2,-2],[2,-2],[4,2],[-4,2]],
+  kiteEq:[[0,-3],[3,-1],[0,3],[-3,-1]]
+};
+const P=k=>PRESETS[k].map(([x,y])=>v(x,y));
+const SHAPES=['rectangle','square','parallelogram','kite','rhombus','trapezium'];
+const NAME={free:'Free',rectangle:'Rectangle',square:'Square',parallelogram:'Parallelogram',kite:'Kite',rhombus:'Rhombus',trapezium:'Trapezium'};
+// Worksheet answers (order OS AS RA PP DE DP AE)
+const TABLE={
+  rectangle:    [1,0,1,1,1,0,1],
+  square:       [1,1,1,1,1,1,1],
+  parallelogram:[1,0,0,1,0,0,0],
+  kite:         [0,0,0,0,0,1,0],
+  rhombus:      [1,1,0,1,0,1,0],
+  trapezium:    [0,0,0,0,0,0,0]
+};
+const TRICKY=new Set(['rhombus:RA','rhombus:DE','rhombus:AE','parallelogram:DE','parallelogram:DP','parallelogram:AE','rectangle:DP','kite:DP']);
+const WHY={
+  'rectangle:OS':'The top and bottom match, and the two ends match.',
+  'rectangle:AS':'A rectangle is longer one way than the other. Only a square has all four sides equal.',
+  'rectangle:RA':'Every corner of a rectangle is a square corner.',
+  'rectangle:PP':'Top and bottom are parallel, and so are the two ends.',
+  'rectangle:DE':'Both diagonals stretch across the same width and height, so they are the same length.',
+  'rectangle:DP':'A rectangle’s diagonals cross like an X, not a plus sign. They only cross at 90° when the rectangle is a square.',
+  'rectangle:AE':'All four corners are 90°, so they are all equal.',
+  'square:OS':'All four sides are equal, so opposite sides are too.',
+  'square:DP':'A square is a special rhombus, so its diagonals cross at 90°.',
+  'square:DE':'A square is a special rectangle, so its diagonals are equal.',
+  'parallelogram:OS':'Opposite sides of a parallelogram always match.',
+  'parallelogram:AS':'Usually two sides are long and two are short. If all four were equal it would be a rhombus.',
+  'parallelogram:RA':'A parallelogram leans over, so it has two wide corners and two narrow corners.',
+  'parallelogram:PP':'That is what “parallelogram” means: two pairs of parallel sides.',
+  'parallelogram:DE':'Because it leans, one diagonal is long and the other is short. If they were equal it would be a rectangle.',
+  'parallelogram:DP':'The diagonals cut each other in half, but they cross at a slant. If they crossed at 90° it would be a rhombus.',
+  'parallelogram:AE':'Opposite angles match, but neighbouring angles don’t, for example 63° and 117°.',
+  'kite:OS':'A kite’s equal sides are next to each other (neighbours), not opposite each other.',
+  'kite:AS':'The two top sides are short and the two bottom sides are long.',
+  'kite:RA':'A kite’s corners are usually all different, and none has to be 90°.',
+  'kite:PP':'None of a kite’s sides are parallel.',
+  'kite:DE':'The long diagonal runs top to bottom and the short one goes across, so they are not equal.',
+  'kite:DP':'This one surprises people! A kite is symmetrical about one diagonal, so the other diagonal crosses it at exactly 90°.',
+  'kite:AE':'The top, bottom and side corners are all different sizes.',
+  'rhombus:OS':'All four sides are equal, so opposite sides are equal too.',
+  'rhombus:AS':'That is what makes it a rhombus: four equal sides.',
+  'rhombus:RA':'A rhombus is like a square that has been pushed over. All the sides are equal, but the corners are not 90°. With 90° corners it would be a square.',
+  'rhombus:PP':'A rhombus is a special parallelogram, so both pairs of sides are parallel.',
+  'rhombus:DE':'One diagonal is long and the other is short, like a diamond. Only a square has equal diagonals as well as equal sides.',
+  'rhombus:DP':'A rhombus’s diagonals always cross like a plus sign, at 90°.',
+  'rhombus:AE':'Two corners are wide and two are narrow, so the angles are not all equal.',
+  'trapezium:OS':'Its two parallel sides are different lengths, so opposite sides don’t match.',
+  'trapezium:AS':'The sides are all different lengths.',
+  'trapezium:RA':'Usually none of its corners are 90°.',
+  'trapezium:PP':'A trapezium has only ONE pair of parallel sides, not two.',
+  'trapezium:DE':'Not usually. A special isosceles trapezium, whose two slanted sides match, does have equal diagonals.',
+  'trapezium:DP':'Its diagonals cross at a slant.',
+  'trapezium:AE':'The corners are different sizes.'
+};
+const HINTS={
+  OS:['Make the sides that face each other the same length. Count the grid squares.','Make one side longer or shorter than the side facing it.'],
+  AS:['Make all four sides the same length. Slanted sides count too: a slope of 3 across and 4 up is 5 cm long.','Make at least one side a different length from the others.'],
+  RA:['Make every corner a square corner (90°).','Tilt a corner so it isn’t 90° any more.'],
+  PP:['Make both pairs of facing sides run in the same direction, like train tracks.','Make at least one pair of facing sides slope towards each other.'],
+  DE:['Look at the dashed diagonals and make them the same length.','Make one diagonal longer than the other.'],
+  DP:['Make the diagonals cross like a plus sign (90°).','Make the diagonals cross at a slant, like an X.'],
+  AE:['Make all four corners the same size. With four equal corners, each one is 90°.','Make the corners different sizes.']
+};
+const SHAPE_HINT={
+  kite:'Make two pairs of neighbouring sides equal: the two top sides match each other and the two bottom sides match each other.',
+  trapezium:'Make exactly one pair of facing sides parallel, like a table top and its floor line.',
+  parallelogram:'Make both pairs of facing sides parallel.',
+  rectangle:'Make four square corners with one pair of sides longer than the other.',
+  square:'Make four equal sides and four square corners.',
+  rhombus:'Make four equal sides that lean over.'
+};
+
+/* ---------- analysis ---------- */
+function analyse(V){
+  const L=[0,1,2,3].map(i=>len(sub(V[(i+1)%4],V[i])));
+  const o=Math.sign(area(V))||1;
+  const crossed=segX(V[0],V[1],V[2],V[3])||segX(V[1],V[2],V[3],V[0]);
+  const ang=[0,1,2,3].map(i=>{
+    const p=V[(i+3)%4],c=V[i],n=V[(i+1)%4],a=sub(p,c),b=sub(n,c);
+    let t=Math.acos(Math.max(-1,Math.min(1,dot(a,b)/(len(a)*len(b)||1))))*R2D;
+    if(crs(sub(c,p),sub(n,c))*o<0)t=360-t;return t;});
+  const concave=!crossed&&ang.some(t=>t>180.5);
+  const d=[len(sub(V[2],V[0])),len(sub(V[3],V[1]))];
+  const dAng=lineAngle(sub(V[2],V[0]),sub(V[3],V[1]));
+  const par=[lineAngle(sub(V[1],V[0]),sub(V[3],V[2]))<.5,lineAngle(sub(V[2],V[1]),sub(V[0],V[3]))<.5];
+  const eq=(a,b)=>fmt(a)===fmt(b);
+  const rA=ang.map(Math.round);
+  const f={
+    OS:eq(L[0],L[2])&&eq(L[1],L[3]),
+    AS:eq(L[0],L[1])&&eq(L[1],L[2])&&eq(L[2],L[3]),
+    RA:rA.every(t=>t===90),
+    PP:par[0]&&par[1],
+    DE:eq(d[0],d[1]),
+    DP:Math.round(dAng)===90,
+    AE:rA.every(t=>t===rA[0])
+  };
+  const kA=eq(L[0],L[1])&&eq(L[2],L[3]),kB=eq(L[1],L[2])&&eq(L[3],L[0]);
+  let c;
+  if(crossed)c={key:'crossed',pre:'Uh-oh!',name:'Not a quadrilateral',note:'Two sides cross over each other. A quadrilateral’s sides can only meet at its corners. Drag a corner to untangle it.'};
+  else if(f.PP&&f.AS&&f.RA)c={key:'square',name:'Square',also:['rectangle','rhombus','parallelogram','kite'],note:'Four equal sides and four right angles. It has every property in the list!'};
+  else if(f.PP&&f.RA)c={key:'rectangle',name:'Rectangle',also:['parallelogram'],note:'Four right angles, with long sides and short sides.'};
+  else if(f.PP&&f.AS)c={key:'rhombus',name:'Rhombus',also:['parallelogram','kite'],note:'Four equal sides, but it leans over, so the corners are not right angles.'};
+  else if(f.PP)c={key:'parallelogram',name:'Parallelogram',note:'Two pairs of parallel sides, leaning over.'};
+  else if((kA||kB)&&!concave)c={key:'kite',name:'Kite',note:f.DE?'Two pairs of equal sides next to each other. This kite’s diagonals happen to be equal too!':'Two pairs of equal sides that sit next to each other.'};
+  else if(kA||kB)c={key:'dart',name:'Dart',note:'An arrowhead: a kite with one corner pushed in.'};
+  else if(par[0]!==par[1]){
+    const iso=par[0]?eq(L[1],L[3]):eq(L[0],L[2]);
+    c={key:'trapezium',name:'Trapezium',note:iso?'Exactly one pair of parallel sides. This one is isosceles: its two slanted sides match, so its diagonals are equal too.':'Exactly one pair of parallel sides.'};
+  }
+  else if(concave)c={key:'quad',pre:'Your shape is just a',name:'Quadrilateral',note:'It’s concave: one corner points inwards (more than 180°).'};
+  else c={key:'quad',pre:'Your shape is just a',name:'Quadrilateral',note:'No special name. It’s a plain four-sided shape.'};
+  return {L,ang,rA,d,dAng,par,f,cls:c,crossed,concave};
+}
+
+/* ---------- state ---------- */
+const S={mode:'explore',V:P('rhombus'),lock:'rhombus',len:true,ang:true,diag:true,snap:true,hl:null,pin:null,
+  px:.04,bounds:{x0:-9,x1:9,y0:-6,y1:6},drag:null,anim:0,rules:{},cand:null,target:null,solved:false,
+  quiz:false,guess:{},checked:false,sel:null,a:null};
+PK.forEach(k=>S.rules[k]='any');
+
+/* ---------- board ---------- */
+const board=$('#board'),gGrid=$('#gGrid'),gShape=$('#gShape');
+function resize(){
+  const r=board.getBoundingClientRect();if(!r.width)return;
+  const u=Math.max(20,Math.min(46,Math.min(r.width/17,r.height/12.5)));
+  S.px=1/u;const w=r.width/u,h=r.height/u;
+  S.bounds={x0:-w/2,x1:w/2,y0:-h/2+.3,y1:h/2+.3};
+  board.setAttribute('viewBox',`${-w/2} ${-h/2+.3} ${w} ${h}`);
+  let g='';
+  for(let x=Math.ceil(-w/2);x<=w/2;x++)g+=`<line class="gl${x%5===0?' s':''}" x1="${x}" y1="${-h/2}" x2="${x}" y2="${h/2+1}"/>`;
+  for(let y=Math.ceil(-h/2);y<=h/2+1;y++)g+=`<line class="gl${y%5===0?' s':''}" x1="${-w/2}" y1="${y}" x2="${w/2}" y2="${y}"/>`;
+  gGrid.innerHTML=g;render();
+}
+function toWorld(e){const pt=board.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(board.getScreenCTM().inverse());return v(p.x,p.y)}
+const clampP=p=>{const b=S.bounds;return v(Math.min(b.x1-.3,Math.max(b.x0+.3,p.x)),Math.min(b.y1-.3,Math.max(b.y0+.3,p.y)))};
+const sn=p=>S.snap?v(Math.round(p.x),Math.round(p.y)):p;
+const snh=t=>S.snap?Math.round(t*2)/2:t;
+
+function render(){
+  const V=S.V,a=analyse(V);S.a=a;
+  const px=S.px,hl=S.hl,C=centroid(V);
+  const pts=V.map(p=>`${p.x},${p.y}`).join(' ');
+  let h=`<polygon class="fill${a.crossed?' bad':''}" data-h="body" points="${pts}"/>`;
+  const T=(x,y,t,cls,anchor='middle')=>`<text class="lab ${cls||''}" x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="central">${t}</text>`;
+  // diagonals
+  const showD=S.diag||hl==='DE'||hl==='DP';
+  if(showD){
+    const dc=(hl==='DE'||hl==='DP')?'diag hi':'diag';
+    h+=`<line class="${dc}" x1="${V[0].x}" y1="${V[0].y}" x2="${V[2].x}" y2="${V[2].y}"/><line class="${dc}" x1="${V[1].x}" y1="${V[1].y}" x2="${V[3].x}" y2="${V[3].y}"/>`;
+    const u1=sub(V[2],V[0]),u2=sub(V[3],V[1]),den=crs(u1,u2);
+    let X=null;
+    if(Math.abs(den)>1e-9){const t=crs(sub(V[1],V[0]),u2)/den,s=crs(sub(V[1],V[0]),u1)/den;if(t>0&&t<1&&s>0&&s<1)X=add(V[0],mul(u1,t));}
+    if(X&&a.f.DP&&!a.crossed){
+      const e1=nrm(u1),e2=nrm(u2),r=11*px;
+      const q1=add(X,mul(e1,r)),q2=add(add(X,mul(e1,r)),mul(e2,r)),q3=add(X,mul(e2,r));
+      h+=`<path class="mk" d="M${q1.x} ${q1.y}L${q2.x} ${q2.y}L${q3.x} ${q3.y}"/>`;
+    }
+    if(hl==='DP'&&X){const b=nrm(add(nrm(u1),mul(nrm(u2),-1)));h+=T(X.x+b.x*26*px,X.y+b.y*26*px,Math.round(a.dAng)+'°','hi');}
+    if(S.len||hl==='DE'){
+      [[0,2,'AC'],[1,3,'BD']].forEach(([i,j,n],k)=>{
+        const p=add(V[i],mul(sub(V[j],V[i]),.3)),nn=nrm(perp(sub(V[j],V[i])));
+        h+=T(p.x+nn.x*12*px,p.y+nn.y*12*px,`${n} ${fmt(a.d[k])}`,'ang'+(hl==='DE'?' hi':''));
+      });
+    }
+  }
+  // sides
+  for(let i=0;i<4;i++){
+    const p=V[i],q=V[(i+1)%4];
+    let c='';if(hl==='OS'||hl==='PP')c=i%2?'p2':'p1';else if(hl==='AS')c='hi';if(a.crossed)c='bad';
+    h+=`<line class="side ${c}" x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}"/>`;
+  }
+  // tick marks for equal sides
+  if(!a.crossed){
+    const groups=[];for(let i=0;i<4;i++){const g=groups.find(g=>fmt(a.L[g[0]])===fmt(a.L[i]));g?g.push(i):groups.push([i]);}
+    let n=0;groups.filter(g=>g.length>1).forEach(g=>{n++;g.forEach(i=>{
+      const p=V[i],q=V[(i+1)%4],m=mid(p,q),e=nrm(sub(q,p)),nn=perp(e);
+      for(let k=0;k<n;k++){const o=(k-(n-1)/2)*6*px,c=add(m,mul(e,o));
+        const s1=add(c,mul(nn,7*px)),s2=add(c,mul(nn,-7*px));
+        h+=`<line class="mk${(hl==='OS'||hl==='PP')?(i%2?' p2':' p1'):''}" x1="${s1.x}" y1="${s1.y}" x2="${s2.x}" y2="${s2.y}"/>`;}
+    });});
+    // parallel arrows
+    let pc=0;[[0,2],[1,3]].forEach(([i,j],k)=>{if(!a.par[k])return;pc++;
+      const e=nrm(sub(V[i+1],V[i]));
+      [i,j].forEach(s=>{const p=V[s],q=V[(s+1)%4],m=add(mid(p,q),mul(nrm(sub(q,p)),-20*px*Math.sign(dot(nrm(sub(q,p)),e)||1))),nn=perp(e);
+        for(let c=0;c<pc;c++){const tip=add(m,mul(e,(5-c*7)*px)),w1=add(add(tip,mul(e,-7*px)),mul(nn,6*px)),w2=add(add(tip,mul(e,-7*px)),mul(nn,-6*px));
+          h+=`<path class="mk${(hl==='OS'||hl==='PP')?(s%2?' p2':' p1'):''}" d="M${w1.x} ${w1.y}L${tip.x} ${tip.y}L${w2.x} ${w2.y}"/>`;}
+      });});
+  }
+  // angles
+  const showA=S.ang||hl==='RA'||hl==='AE';
+  for(let i=0;i<4;i++){
+    const c=V[i],pa=nrm(sub(V[(i+3)%4],c)),pb=nrm(sub(V[(i+1)%4],c));
+    const t=a.ang[i],reflex=t>180,hiA=(hl==='RA'||hl==='AE');
+    let bis=nrm(add(pa,pb));if(len(add(pa,pb))<1e-6)bis=perp(pa);if(reflex)bis=mul(bis,-1);
+    if(!a.crossed&&(showA||hiA)){
+      if(Math.round(t)===90){const r=14*px,q1=add(c,mul(pa,r)),q2=add(q1,mul(pb,r)),q3=add(c,mul(pb,r));
+        h+=`<path class="arc${hiA?' hi':''}" d="M${c.x} ${c.y}L${q1.x} ${q1.y}L${q2.x} ${q2.y}L${q3.x} ${q3.y}Z"/>`;}
+      else{const r=19*px,s=add(c,mul(pa,r)),e=add(c,mul(pb,r));const cw=crs(pa,pb)>0;
+        const sweep=reflex?(cw?0:1):(cw?1:0);
+        h+=`<path class="arc${hiA?' hi':''}" d="M${c.x} ${c.y}L${s.x} ${s.y}A${r} ${r} 0 ${reflex?1:0} ${sweep} ${e.x} ${e.y}Z"/>`;}
+      const lp=add(c,mul(bis,40*px));
+      h+=T(lp.x,lp.y,Math.round(t)+'°','ang'+(hiA?' hi':''));
+    }
+    const vp=add(c,mul(bis,-19*px));
+    h+=`<text class="lab vx" x="${vp.x}" y="${vp.y}" text-anchor="middle" dominant-baseline="central" style="font-size:${17*px}px">${'ABCD'[i]}</text>`;
+  }
+  // side lengths
+  if(S.len||hl==='OS'||hl==='AS'){
+    for(let i=0;i<4;i++){const p=V[i],q=V[(i+1)%4],m=mid(p,q);let nn=nrm(perp(sub(q,p)));if(dot(sub(m,C),nn)<0)nn=mul(nn,-1);
+      const lp=add(m,mul(nn,17*px));let c='';if(hl==='OS'||hl==='PP')c=i%2?'p2':'p1';
+      h+=T(lp.x,lp.y,fmt(a.L[i])+' cm',c);}
+  }
+  // hit areas
+  for(let i=0;i<4;i++){const p=V[i],q=V[(i+1)%4];h+=`<line class="sidehit" data-h="s" data-i="${i}" x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}"/>`;}
+  for(let i=0;i<4;i++){const p=V[i];h+=`<circle class="vhit" data-h="v" data-i="${i}" cx="${p.x}" cy="${p.y}" r="${22*px}"/><circle class="vh" cx="${p.x}" cy="${p.y}" r="${8*px}"/>`;}
+  gShape.setAttribute('font-size',14*px);gShape.style.setProperty('--lw',4*px);
+  gShape.innerHTML=h;
+  updatePanel();
+}
+
+/* ---------- dragging ---------- */
+function orient(N,ref){return Math.sign(area(N))===Math.sign(area(ref))}
+function dragVertex(lock,i,P,S0){
+  const N=clone(S0),i1=(i+1)%4,i2=(i+2)%4,i3=(i+3)%4,O=S0[i2];
+  const place=(X,Y)=>{N[i]=P;N[i2]=O;N[i1]=X;N[i3]=Y;if(!orient(N,S0)){N[i1]=Y;N[i3]=X;}return N;};
+  switch(lock){
+    case 'free':N[i]=P;return N;
+    case 'square':{if(len(sub(P,O))<1)return null;const M=mid(O,P),p=perp(mul(sub(P,O),.5));return place(add(M,p),sub(M,p));}
+    case 'rhombus':{if(len(sub(P,O))<1)return null;const k=len(sub(S0[i1],S0[i3]))/2,M=mid(O,P),dd=nrm(perp(sub(P,O)));return place(add(M,mul(dd,k)),sub(M,mul(dd,k)));}
+    case 'rectangle':{const u=nrm(sub(S0[1],S0[0])),n=perp(u),d=sub(P,O),a=dot(d,u),b=dot(d,n);if(Math.abs(a)<.5||Math.abs(b)<.5)return null;return place(add(O,mul(u,a)),add(O,mul(n,b)));}
+    case 'parallelogram':N[i]=P;N[i1]=sub(add(P,O),S0[i3]);return N;
+    case 'kite':{
+      if(i%2===0){const A=S0[0],ax=sub(S0[2],S0[0]),L2=dot(ax,ax),pu=nrm(perp(ax));
+        N[i]=P;const nA=N[0],nax=sub(N[2],N[0]);if(len(nax)<1)return null;const npu=nrm(perp(nax));
+        [1,3].forEach(j=>{const r=sub(S0[j],A),t=dot(r,ax)/L2,w=dot(r,pu);N[j]=add(add(nA,mul(nax,t)),mul(npu,w));});return N;}
+      const A=S0[0],ax=sub(S0[2],A),foot=add(A,mul(ax,dot(sub(P,A),ax)/dot(ax,ax)));if(len(sub(P,foot))<.4)return null;
+      N[i]=P;N[(i+2)%4]=sub(mul(foot,2),P);return N;}
+    case 'trapezium':{const u=nrm(sub(S0[1],S0[0])),n=perp(u),pt=i<2?1-i:5-i;N[i]=P;N[pt]=add(S0[pt],mul(n,dot(sub(P,S0[i]),n)));return N;}
+  }
+  return null;
+}
+function dragSide(lock,k,dl,S0){
+  const N=clone(S0),k1=(k+1)%4,C=centroid(S0);
+  const outN=()=>{let n=nrm(perp(sub(S0[k1],S0[k])));if(dot(sub(mid(S0[k],S0[k1]),C),n)<0)n=mul(n,-1);return n;};
+  const move=(idx,d)=>{idx.forEach(j=>N[j]=add(S0[j],d));return N;};
+  switch(lock){
+    case 'free':case 'parallelogram':return move([k,k1],sn(dl));
+    case 'rectangle':{const n=outN();return move([k,k1],mul(n,snh(dot(dl,n))));}
+    case 'square':{const n=outN(),s=len(sub(S0[k1],S0[k])),s2=snh(s+dot(dl,n));if(s2<1)return null;
+      const p=S0[(k+3)%4],q=S0[(k+2)%4],M=mid(p,q),e=nrm(sub(q,p));
+      N[(k+3)%4]=sub(M,mul(e,s2/2));N[(k+2)%4]=add(M,mul(e,s2/2));N[k]=add(N[(k+3)%4],mul(n,s2));N[k1]=add(N[(k+2)%4],mul(n,s2));return N;}
+    case 'trapezium':{if(k%2===0)return move([k,k1],sn(dl));const u=nrm(sub(S0[1],S0[0]));return move([k,k1],mul(u,snh(dot(dl,u))));}
+    default:return move([0,1,2,3],sn(dl));
+  }
+}
+function valid(N,locked){
+  if(!N)return false;
+  for(const p of N)if(!isFinite(p.x)||!isFinite(p.y))return false;
+  for(let i=0;i<4;i++)if(len(sub(N[(i+1)%4],N[i]))<.5)return false;
+  if(len(sub(N[2],N[0]))<.3||len(sub(N[3],N[1]))<.3)return false;
+  if(locked){if(Math.abs(area(N))<.5)return false;if(segX(N[0],N[1],N[2],N[3])||segX(N[1],N[2],N[3],N[0]))return false;}
+  return true;
+}
+const curLock=()=>S.mode==='challenge'?'free':S.lock;
+board.addEventListener('pointerdown',e=>{
+  const t=e.target.closest('[data-h]');if(!t)return;
+  if(S.anim){cancelAnimationFrame(S.anim);S.anim=0;}
+  e.preventDefault();try{board.setPointerCapture(e.pointerId)}catch(_){}
+  S.drag={h:t.dataset.h,i:+(t.dataset.i||0),p0:toWorld(e),V0:clone(S.V),id:e.pointerId};
+  board.classList.add('dragging');
+});
+board.addEventListener('pointermove',e=>{
+  const d=S.drag;if(!d||e.pointerId!==d.id)return;
+  const P0=clampP(toWorld(e)),lock=curLock();let N;
+  if(d.h==='v')N=dragVertex(lock,d.i,sn(P0),d.V0);
+  else{const dl=sub(P0,d.p0);N=d.h==='s'?dragSide(lock,d.i,dl,d.V0):d.V0.map(p=>add(p,sn(dl)));}
+  if(valid(N,lock!=='free')){S.V=N;render();}
+});
+const endDrag=()=>{if(S.drag){S.drag=null;board.classList.remove('dragging');}};
+board.addEventListener('pointerup',endDrag);board.addEventListener('pointercancel',endDrag);
+
+function morphTo(T,done){
+  if(S.anim)cancelAnimationFrame(S.anim);
+  const from=clone(S.V);
+  if(reduceMotion){S.V=clone(T);render();done&&done();return;}
+  const t0=performance.now(),D=520;
+  const step=now=>{const t=Math.min(1,(now-t0)/D),e=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+    S.V=from.map((p,i)=>v(p.x+(T[i].x-p.x)*e,p.y+(T[i].y-p.y)*e));render();
+    if(t<1)S.anim=requestAnimationFrame(step);else{S.anim=0;S.V=clone(T);render();done&&done();}};
+  S.anim=requestAnimationFrame(step);
+}
+function rotate(deg){
+  const C=centroid(S.V),r=deg/R2D,c=Math.cos(r),s=Math.sin(r);
+  const T=S.V.map(p=>{const d=sub(p,C);return add(C,v(d.x*c-d.y*s,d.x*s+d.y*c));});
+  morphTo(T);
+}
+
+/* ---------- panel ---------- */
+const panel=$('#panel');
+const pillHTML=(val,sm)=>val===null?`<span class="pill na${sm?' sm':''}">?</span>`:val?`<span class="pill yes${sm?' sm':''}">✓ Yes</span>`:`<span class="pill no${sm?' sm':''}">✗ No</span>`;
+const icon=k=>`<span class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${PROPS.find(p=>p.k===k).icon}</svg></span>`;
+const list=a=>a.length<2?a[0]:a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+
+function evidence(k,a){
+  const L=a.L.map(fmt),r=a.rA,ok=b=>b?'✓':'✗';
+  switch(k){
+    case 'OS':return `AB ${L[0]} & CD ${L[2]} ${ok(L[0]===L[2])} · BC ${L[1]} & DA ${L[3]} ${ok(L[1]===L[3])}`;
+    case 'AS':return `AB ${L[0]} · BC ${L[1]} · CD ${L[2]} · DA ${L[3]}`;
+    case 'RA':case 'AE':return `A ${r[0]}° · B ${r[1]}° · C ${r[2]}° · D ${r[3]}°`;
+    case 'PP':return `AB ∥ CD ${ok(a.par[0])} · BC ∥ DA ${ok(a.par[1])}`;
+    case 'DE':return `AC ${fmt(a.d[0])} · BD ${fmt(a.d[1])}`;
+    case 'DP':return `They cross at ${Math.round(a.dAng)}°`;
+  }
+}
+function buildPanel(){
+  const m=S.mode;
+  const rows=PROPS.map(p=>`<button type="button" class="prow" data-prop="${p.k}" id="row-${p.k}">${icon(p.k)}<span class="ptext"><span class="plabel">${p.label}</span><span class="phelp">${p.help}</span><span class="pev" id="ev-${p.k}"></span></span><span class="pills" id="pl-${p.k}"></span></button>`).join('');
+  if(m==='explore'){
+    panel.innerHTML=`<div><div class="eyebrow" id="pre">Your shape is a</div><div class="shapename" id="nm"></div><p class="note" id="nt"></p><p class="also" id="al"></p></div>
+      <div class="eyebrow">Its properties <span style="text-transform:none;letter-spacing:0;font-weight:600">· tap one to see it on the shape</span></div>
+      <div class="plist">${rows}</div><div class="sum" id="sum"></div>`;
+  }else if(m==='rules'){
+    panel.innerHTML=`<p class="intro">Tap a property to make it a rule. Each tap moves it along: <b>Any</b> → <b>Must have</b> → <b>Must not have</b>. The shape changes to the simplest one that follows all your rules.</p>
+      <div class="plist">${rows}</div>
+      <div class="result" id="rres"></div>
+      <div class="btns"><button class="btn" id="rclear" type="button">Clear all rules</button></div>`;
+    $('#rclear').onclick=()=>{PK.forEach(k=>S.rules[k]='any');applyRules();};
+  }else if(m==='challenge'){
+    panel.innerHTML=`<div><div class="eyebrow">Challenge</div><div class="shapename" id="tg"></div><p class="note">Drag the corners and sides until every row matches.</p>
+      <div class="meter"><span id="tgm"></span></div><p class="also" id="tgc"></p></div>
+      <div class="plist">${rows}</div>
+      <p class="hint" id="hint" hidden></p>
+      <div class="btns"><button class="btn" id="bHint" type="button">Give me a hint</button><button class="btn primary" id="bNext" type="button">New challenge</button></div>`;
+    $('#bHint').onclick=showHint;$('#bNext').onclick=newChallenge;
+  }
+  updatePanel();
+}
+function updatePanel(){
+  const a=S.a;if(!a||!panel.firstChild)return;
+  const m=S.mode;
+  PK.forEach(k=>{const row=$('#row-'+k);if(row)row.classList.toggle('on',S.hl===k);});
+  if(m==='explore'){
+    $('#pre').textContent=a.cls.pre||'Your shape is a';
+    const nm=$('#nm');nm.textContent=a.cls.name;nm.classList.toggle('bad',a.crossed);
+    $('#nt').textContent=a.cls.note;
+    $('#al').innerHTML=a.cls.also?`It’s also a special <b>${list(a.cls.also)}</b>.`:'';
+    PK.forEach(k=>{$('#pl-'+k).innerHTML=pillHTML(a.crossed?null:a.f[k]);$('#ev-'+k).textContent=a.crossed?'':evidence(k,a);});
+    const s=a.rA.reduce((x,y)=>x+y,0);
+    $('#sum').innerHTML=a.crossed?'':`<b>Angle fact:</b> the four angles of any quadrilateral add up to 360°. ${a.rA.join('° + ')}° ${s===360?'=':'≈'} 360°`;
+  }else if(m==='rules'){
+    PK.forEach(k=>{const r=S.rules[k];
+      const chip=r==='any'?'<span class="pill any sm">Any</span>':r==='yes'?'<span class="pill yes sm">Must have</span>':'<span class="pill no sm">Must not have</span>';
+      $('#pl-'+k).innerHTML=chip+`<span style="font-size:12px;color:var(--ink-2)">now: ${a.crossed?'?':a.f[k]?'yes':'no'}</span>`;
+      $('#ev-'+k).textContent='';});
+  }else if(m==='challenge'&&S.target){
+    const want=TABLE[S.target];let n=0;
+    PK.forEach((k,j)=>{const have=a.crossed?null:a.f[k],need=!!want[j],match=have===need;if(match)n++;
+      const row=$('#row-'+k);row.classList.toggle('match',match);row.classList.toggle('miss',!match);
+      $('#pl-'+k).innerHTML=`<span style="font-size:12px;color:var(--ink-2)">needs</span>${pillHTML(need,1)}<span style="font-size:12px;color:var(--ink-2)">yours</span>${pillHTML(have,1)}`;
+      $('#ev-'+k).textContent=a.crossed?'':evidence(k,a);});
+    $('#tg').textContent='Make a '+NAME[S.target].toLowerCase();
+    $('#tgm').style.width=(n/7*100)+'%';
+    const done=a.cls.key===S.target;
+    $('#tgc').innerHTML=done?`<b>Solved!</b> That’s a ${NAME[S.target].toLowerCase()}.`:n===7?`All 7 rows match, but it isn’t a ${NAME[S.target].toLowerCase()} yet. Try a hint.`:`${n} of 7 properties match`;
+    if(done&&!S.solved){S.solved=true;celebrate(`That’s a ${NAME[S.target].toLowerCase()}!`);}
+  }
+  setNote();
+}
+function setNote(){
+  const n=$('#lockNote');
+  if(S.mode==='challenge')n.innerHTML='<b>Free drag</b>. Anything goes, so make the target shape.';
+  else if(S.mode==='rules')n.innerHTML=S.lock==='free'?'<b>Free drag</b>. Anything goes.':`Chosen by your rules. Dragging keeps it a <b>${NAME[S.lock].toLowerCase()}</b>.`;
+  else n.innerHTML=S.lock==='free'?'<b>Free drag</b>. Anything goes. Watch the name change!':`<b>Locked</b>: it stays a ${NAME[S.lock].toLowerCase()} however you drag it. Pick <b>Free</b> to break the rules.`;
+}
+panel.addEventListener('pointerover',e=>{const r=e.target.closest('[data-prop]');if(r&&e.pointerType==='mouse'&&S.hl!==r.dataset.prop){S.hl=r.dataset.prop;render();}});
+panel.addEventListener('pointerleave',()=>{if(S.hl!==S.pin){S.hl=S.pin;render();}});
+panel.addEventListener('click',e=>{const r=e.target.closest('[data-prop]');if(!r)return;const k=r.dataset.prop;
+  if(S.mode==='rules'){S.rules[k]={any:'yes',yes:'no',no:'any'}[S.rules[k]];applyRules();return;}
+  S.pin=S.pin===k?null:k;S.hl=S.pin;render();});
+
+/* ---------- rules ---------- */
+const CANDS=[
+  {id:'free',lock:'free',name:'Quadrilateral'},{id:'kite',lock:'kite',name:'Kite'},{id:'isoTrap',lock:'trapezium',name:'Trapezium'},
+  {id:'kiteEq',lock:'kite',name:'Kite'},{id:'parallelogram',lock:'parallelogram',name:'Parallelogram'},
+  {id:'rectangle',lock:'rectangle',name:'Rectangle'},{id:'rhombus',lock:'rhombus',name:'Rhombus'},{id:'square',lock:'square',name:'Square'}
+];
+CANDS.forEach(c=>{c.f=analyse(P(c.id)).f;c.yes=PK.filter(k=>c.f[k]).length;});
+const RECT='Four right angles make a rectangle, ',RH='Four equal sides make a rhombus, ';
+const IMPL=[
+  [['RA'],'AE','If every angle is a right angle, then all the angles are equal (they are all 90°).'],
+  [['AE'],'RA','If all four angles are equal, each one must be 360° ÷ 4 = 90°, which is a right angle!'],
+  [['AS'],'OS','If all four sides are equal, the opposite sides are certainly equal.'],
+  [['AS'],'PP',RH+'and a rhombus has two pairs of parallel sides.'],
+  [['AS'],'DP',RH+'and a rhombus’s diagonals always cross at right angles.'],
+  [['OS'],'PP','When both pairs of opposite sides are equal, the shape is a parallelogram, so they are parallel too.'],
+  [['PP'],'OS','When both pairs of opposite sides are parallel, the shape is a parallelogram, so opposite sides are equal too.'],
+  [['RA'],'PP',RECT+'and a rectangle has two pairs of parallel sides.'],
+  [['RA'],'OS',RECT+'and a rectangle’s opposite sides are equal.'],
+  [['RA'],'DE',RECT+'and a rectangle’s diagonals are always equal.'],
+  [['PP','DE'],'RA','A parallelogram with equal diagonals has to be a rectangle, so its angles are right angles.'],
+  [['PP','DP'],'AS','A parallelogram whose diagonals cross at right angles has to be a rhombus, so all its sides are equal.']
+];
+function applyRules(){
+  const R=S.rules,fits=CANDS.filter(c=>PK.every(k=>R[k]==='any'||(R[k]==='yes')===c.f[k]));
+  const best=fits.sort((x,y)=>x.yes-y.yes)[0];
+  const box=$('#rres'),picked=PK.filter(k=>R[k]!=='any');
+  if(!best){
+    const known=new Set(PK.filter(k=>R[k]==='yes')),why={};let grew=true;
+    while(grew){grew=false;IMPL.forEach(([pre,c,w])=>{if(!known.has(c)&&pre.every(p=>known.has(p))){known.add(c);why[c]=w;grew=true;}});}
+    const clash=PK.find(k=>R[k]==='no'&&known.has(k));
+    box.className='result bad';
+    box.innerHTML=`<div class="eyebrow">Impossible!</div><div class="shapename bad" style="font-size:26px">No quadrilateral can do that</div><p>${clash?why[clash]+' So “'+PROPS.find(p=>p.k===clash).label.toLowerCase()+'” can’t be a “must not”.':'These rules fight each other. Try changing one of them.'}</p>`;
+    box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake');
+    updatePanel();return;
+  }
+  box.className='result';
+  const bonus=PK.filter(k=>R[k]==='any'&&best.f[k]).map(k=>'“'+PROPS.find(p=>p.k===k).label.toLowerCase()+'”');
+  let msg=picked.length?`The simplest shape that follows your ${picked.length===1?'rule':picked.length+' rules'}.`:'No rules yet, so any four-sided shape will do. Tap a property to add a rule.';
+  if(bonus.length&&picked.length)msg+=` <b>Free bonus:</b> it also has ${list(bonus)}. Those come automatically!`;
+  if(best.id==='isoTrap')msg+=' It’s a special <b>isosceles</b> trapezium: the slanted sides match, which makes the diagonals equal.';
+  if(best.id==='kiteEq')msg+=' A kite can be drawn so that its diagonals are the same length.';
+  box.innerHTML=`<div class="eyebrow">Your rules make a</div><div class="shapename" style="font-size:30px">${best.name}</div><p>${msg}</p>`;
+  if(S.cand!==best.id){S.cand=best.id;S.lock=best.lock;morphTo(P(best.id));}else updatePanel();
+}
+
+/* ---------- challenge ---------- */
+function newChallenge(){
+  const opts=SHAPES.filter(s=>s!==S.target);S.target=opts[Math.floor(Math.random()*opts.length)];
+  S.solved=false;$('#celebrate').hidden=true;const h=$('#hint');if(h)h.hidden=true;
+  morphTo(P('free'));updatePanel();
+}
+function showHint(){
+  const a=S.a,want=TABLE[S.target],h=$('#hint');
+  let t;
+  if(a.crossed)t='First untangle it: drag a corner so the sides don’t cross.';
+  else{const j=PK.findIndex((k,j)=>a.f[k]!==!!want[j]);
+    t=j<0?(a.cls.key===S.target?'You’ve already done it!':SHAPE_HINT[S.target]):`<b>${PROPS[j].label}</b> should be <b>${want[j]?'Yes':'No'}</b>. ${HINTS[PK[j]][want[j]?0:1]}`;}
+  h.innerHTML=t;h.hidden=false;
+}
+function celebrate(text){
+  const c=$('#celebrate');c.innerHTML=`<strong>Brilliant! ${text}</strong><button class="btn primary" type="button" id="cNext">Next challenge</button>`;c.hidden=false;
+  $('#cNext').onclick=newChallenge;
+  if(reduceMotion)return;
+  const b=$('#burst'),cols=['var(--pen)','var(--hi)','var(--yes)','var(--p1)','var(--p2)'];b.innerHTML='';
+  for(let i=0;i<26;i++){const el=document.createElement('i');const ang=Math.random()*Math.PI*2,d=120+Math.random()*180;
+    el.style.cssText=`background:${cols[i%5]};--dx:${Math.cos(ang)*d}px;--dy:${Math.sin(ang)*d}px;--r:${Math.random()*540}deg`;b.appendChild(el);}
+  setTimeout(()=>b.innerHTML='',1300);
+}
+
+/* ---------- chips ---------- */
+function mini(k,w=26,h=18){
+  const pts=P(k==='free'?'free':k),xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),s=Math.min((w-4)/(x1-x0),(h-4)/(y1-y0));
+  const ox=(w-(x1-x0)*s)/2,oy=(h-(y1-y0)*s)/2;
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polygon points="${pts.map(p=>((p.x-x0)*s+ox).toFixed(1)+','+((p.y-y0)*s+oy).toFixed(1)).join(' ')}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
+}
+const chips=$('#chips');
+chips.innerHTML=['free',...SHAPES].map(k=>`<button type="button" class="chip" data-shape="${k}" aria-pressed="false">${k==='free'?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9V5h4M15 5h4v4M19 15v4h-4M9 19H5v-4"/></svg>':mini(k)}${NAME[k]}</button>`).join('');
+function syncChips(){chips.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',String(c.dataset.shape===S.lock)));}
+chips.addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;const k=c.dataset.shape;
+  S.lock=k;syncChips();if(k!=='free')morphTo(P(k));else render();});
+
+/* ---------- toggles ---------- */
+[['#tLen','len'],['#tAng','ang'],['#tDiag','diag'],['#tSnap','snap']].forEach(([id,key])=>{
+  const b=$(id);b.setAttribute('aria-pressed',String(S[key]));b.onclick=()=>{S[key]=!S[key];b.setAttribute('aria-pressed',String(S[key]));render();};});
+$('#rotL').onclick=()=>rotate(-15);$('#rotR').onclick=()=>rotate(15);
+
+/* ---------- table ---------- */
+let selCell=null;
+function buildTable(){
+  const t=$('#ptable');
+  let h='<thead><tr><th scope="col" style="text-align:left">Property</th>'+SHAPES.map(s=>`<th scope="col"><button class="colhead" type="button" data-open="${s}">${mini(s,44,28)}${NAME[s]}<small>Open ›</small></button></th>`).join('')+'</tr></thead><tbody>';
+  PROPS.forEach((p,j)=>{h+=`<tr><th scope="row">${p.label}</th>`+SHAPES.map(s=>{
+    const id=s+':'+p.k,ans=!!TABLE[s][j];let inner;
+    if(S.quiz){const g=S.guess[id];inner=g===undefined?'<span class="pill q">?</span>':pillHTML(g);
+      if(S.checked&&g!==undefined)inner=inner.replace('class="pill','class="pill '+(g===ans?'right':'wrong'));}
+    else inner=pillHTML(ans);
+    return `<td><button class="cell${selCell===id?' sel':''}" type="button" data-cell="${id}" aria-label="${NAME[s]}: ${p.label}">${inner}${TRICKY.has(id)?'<span class="star" aria-hidden="true">★</span>':''}</button></td>`;}).join('')+'</tr>';});
+  t.innerHTML=h+'</tbody>';
+}
+$('#ptable').addEventListener('click',e=>{
+  const o=e.target.closest('[data-open]');if(o){openInExplore(o.dataset.open,null);return;}
+  const c=e.target.closest('[data-cell]');if(!c)return;const id=c.dataset.cell;
+  if(S.quiz&&!S.checked){const g=S.guess[id];S.guess[id]=g===undefined?true:g===true?false:undefined;if(S.guess[id]===undefined)delete S.guess[id];buildTable();return;}
+  selCell=id;buildTable();showWhy(id);
+});
+function showWhy(id){
+  const [s,k]=id.split(':'),j=PK.indexOf(k),ans=!!TABLE[s][j];
+  const txt=WHY[id]||(ans?`Every ${s} has this property.`:`A ${s} doesn’t have this property.`);
+  $('#why').innerHTML=`<p><b>${NAME[s]} · ${PROPS[j].label}: ${ans?'Yes':'No'}.</b> ${txt}</p><button class="btn primary" type="button" id="showMe">Show me</button>`;
+  $('#showMe').onclick=()=>openInExplore(s,k);
+}
+function openInExplore(s,k){S.lock=s;S.pin=k;S.hl=k;if(k==='DE'||k==='DP'){S.diag=true;$('#tDiag').setAttribute('aria-pressed','true');}setMode('explore');morphTo(P(s));}
+$('#quizBtn').onclick=()=>{S.quiz=!S.quiz;S.guess={};S.checked=false;selCell=null;$('#quizBtn').setAttribute('aria-pressed',String(S.quiz));
+  $('#checkBtn').hidden=!S.quiz;$('#resetQuiz').hidden=!S.quiz;
+  $('#why').innerHTML=S.quiz?'<p>Tap each <b>?</b> to choose Yes or No (tap again to change it). Then press <b>Check my answers</b>.</p>':'<p>Tap an answer in the table to see the reason.</p>';buildTable();};
+$('#checkBtn').onclick=()=>{S.checked=true;let right=0,done=0;
+  SHAPES.forEach(s=>PK.forEach((k,j)=>{const g=S.guess[s+':'+k];if(g!==undefined){done++;if(g===!!TABLE[s][j])right++;}}));
+  $('#why').innerHTML=`<p><span class="score">${right} of 42 correct</span>${done<42?` · ${42-done} left blank`:''}. Green rings are right, red rings need another look. Press <b>Start again</b> to try again, or switch quiz mode off to read the reasons.</p>`;buildTable();};
+$('#resetQuiz').onclick=()=>{S.guess={};S.checked=false;$('#why').innerHTML='<p>Tap each <b>?</b> to choose Yes or No. Then press <b>Check my answers</b>.</p>';buildTable();};
+
+/* ---------- modes ---------- */
+function setMode(m){
+  S.mode=m;document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.mode===m)));
+  $('#studio').hidden=m==='table';$('#tableView').hidden=m!=='table';
+  chips.hidden=m!=='explore';$('#celebrate').hidden=true;
+  if(m!=='explore'){S.pin=null;S.hl=null;}
+  if(m==='table'){buildTable();return;}
+  buildPanel();
+  requestAnimationFrame(resize);
+  if(m==='explore'){syncChips();render();}
+  if(m==='rules'){S.cand=null;applyRules();}
+  if(m==='challenge'){S.lock='free';newChallenge();}
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>setMode(t.dataset.mode));
+new ResizeObserver(()=>resize()).observe(board);
+const start=(location.hash||'').slice(1);
+setMode(['rules','challenge','table'].includes(start)?start:'explore');
+})();
+</script>
+
+</html>
